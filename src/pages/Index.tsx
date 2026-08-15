@@ -11,10 +11,14 @@ import { CartDrawer } from '../components/CartDrawer';
 import { CheckoutModal } from '../components/CheckoutModal';
 import { OrderSuccessModal } from '../components/OrderSuccessModal';
 import { CustomCakeModal } from '../components/CustomCakeModal';
+import { ComboBuilderModal } from '../components/ComboBuilderModal';
+import { TrackOrderModal } from '../components/TrackOrderModal';
+import { ReviewModal } from '../components/ReviewModal';
+import { PincodeChecker } from '../components/PincodeChecker';
 import { StoreLocations } from '../components/StoreLocations';
 import { WhyChooseUs } from '../components/WhyChooseUs';
 import { Footer } from '../components/Footer';
-import { Sparkles, Utensils, Heart, Filter, Cake } from 'lucide-react';
+import { Sparkles, Package, Clock, MessageSquare, Gift, Heart, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const IndexContent: React.FC = () => {
@@ -23,56 +27,10 @@ const IndexContent: React.FC = () => {
   const [egglessOnly, setEgglessOnly] = useState<boolean>(false);
   const [activeModalProduct, setActiveModalProduct] = useState<BakeryProduct | null>(null);
 
-  // Filter products based on search, category and eggless toggle
-  const filteredProducts = useMemo(() => {
-    return BAKERY_PRODUCTS.filter((product) => {
-      // Category filter
-      if (selectedCategory !== 'all' && product.category !== selectedCategory) {
-        return false;
-      }
-      // Eggless filter
-      if (egglessOnly && !product.isEggless) {
-        return false;
-      }
-      // Search query filter
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesName = product.name.toLowerCase().includes(q);
-        const matchesTamil = product.tamilName?.toLowerCase().includes(q);
-        const matchesDesc = product.description.toLowerCase().includes(q);
-        const matchesCategory = product.category.toLowerCase().includes(q);
-        return matchesName || matchesTamil || matchesDesc || matchesCategory;
-      }
-      return true;
-    });
-  }, [selectedCategory, egglessOnly, searchQuery]);
-
-  const scrollToMenu = () => {
-    const el =<dyad-write path="src/pages/Index.tsx" description="Main Chennai Bakery page integrating Hero, Category filter, Product grid, Modals, Cart drawer, and Outlets">
-import React, { useState, useMemo } from 'react';
-import { BAKERY_PRODUCTS } from '../data/bakeryData';
-import { BakeryProduct } from '../types/bakery';
-import { CartProvider } from '../context/CartContext';
-import { Header } from '../components/Header';
-import { HeroBanner } from '../components/HeroBanner';
-import { CategoryFilter } from '../components/CategoryFilter';
-import { ProductCard } from '../components/ProductCard';
-import { ProductModal } from '../components/ProductModal';
-import { CartDrawer } from '../components/CartDrawer';
-import { CheckoutModal } from '../components/CheckoutModal';
-import { OrderSuccessModal } from '../components/OrderSuccessModal';
-import { CustomCakeModal } from '../components/CustomCakeModal';
-import { StoreLocations } from '../components/StoreLocations';
-import { WhyChooseUs } from '../components/WhyChooseUs';
-import { Footer } from '../components/Footer';
-import { Sparkles, Utensils, Heart, Filter, Cake } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
-const IndexContent: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [egglessOnly, setEgglessOnly] = useState<boolean>(false);
-  const [activeModalProduct, setActiveModalProduct] = useState<BakeryProduct | null>(null);
+  // Modals state
+  const [isComboModalOpen, setIsComboModalOpen] = useState<boolean>(false);
+  const [isTrackModalOpen, setIsTrackModalOpen] = useState<boolean>(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
 
   // Filter products based on search, category and eggless toggle
   const filteredProducts = useMemo(() => {
@@ -140,9 +98,71 @@ const IndexContent: React.FC = () => {
       {/* Hero Section */}
       <HeroBanner onExploreClick={scrollToMenu} />
 
+      {/* Quick Action Floating Ribbon */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white/95 backdrop-blur-md p-3 rounded-3xl shadow-xl border border-amber-200/80">
+          <button
+            onClick={() => setIsComboModalOpen(true)}
+            className="flex items-center gap-2 p-2.5 rounded-2xl hover:bg-amber-50 transition-colors text-left"
+          >
+            <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+              <Gift className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-amber-950">High-Tea Box</p>
+              <p className="text-[10px] text-amber-700">Save ₹55 on Combos</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setIsTrackModalOpen(true)}
+            className="flex items-center gap-2 p-2.5 rounded-2xl hover:bg-rose-50 transition-colors text-left"
+          >
+            <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-amber-950">Live Order Tracker</p>
+              <p className="text-[10px] text-rose-700">Check Baking Status</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setIsReviewModalOpen(true)}
+            className="flex items-center gap-2 p-2.5 rounded-2xl hover:bg-yellow-50 transition-colors text-left"
+          >
+            <div className="w-9 h-9 rounded-xl bg-yellow-100 text-yellow-800 flex items-center justify-center shrink-0">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-amber-950">Customer Reviews</p>
+              <p className="text-[10px] text-yellow-800">4.9 ★ (50k+ Chennaiites)</p>
+            </div>
+          </button>
+
+          <a
+            href="https://wa.me/919840012345?text=Vanakkam%20Chennai%20Bakery!%20I%20would%20like%20to%20inquire%20about%20fresh%20bakes%20and%20today%27s%20specials."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 p-2.5 rounded-2xl hover:bg-emerald-50 transition-colors text-left"
+          >
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <Phone className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-amber-950">WhatsApp Order</p>
+              <p className="text-[10px] text-emerald-700">Instant Baker Chat</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
       {/* Main Menu & Catalog Section */}
       <main id="menu-section" className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         
+        {/* Pincode Availability Checker */}
+        <PincodeChecker />
+
         {/* Category Pills Bar */}
         <CategoryFilter
           selectedCategory={selectedCategory}
@@ -236,6 +256,9 @@ const IndexContent: React.FC = () => {
       <CheckoutModal />
       <OrderSuccessModal />
       <CustomCakeModal />
+      <ComboBuilderModal isOpen={isComboModalOpen} onClose={() => setIsComboModalOpen(false)} />
+      <TrackOrderModal isOpen={isTrackModalOpen} onClose={() => setIsTrackModalOpen(false)} />
+      <ReviewModal isOpen={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} />
 
     </div>
   );
